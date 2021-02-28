@@ -1,0 +1,3 @@
+npm install react-navigation react-navigation-drawer
+expo install @react-native-community/datetimepicker
+npm install @react-native-community/async-storage axios react-native-vector-icons moment
