@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Platform,
   Modal,
@@ -9,13 +9,45 @@ import {
   StyleSheet,
   TouchableWithoutFeedback as TWF,
 } from 'react-native';
+import DateTimePicker from '@react-native-community/datetimepicker'
+import moment from 'moment';
+import 'moment/locale/pt-br';
 
-import moment, { relativeTimeThreshold } from 'moment';
-import { render } from 'react-dom';
-
-const state = { desc: '', date: new Date(), showDatePicker: false }
 const addTask = (props) => {
+  const [desc, setDesc] = useState('');
+  const [date, setDate] = useState(new Date());
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
+  const onChange = (event, selectedDate) => {
+    const currentDate = selectedDate || date;
+    setDate(currentDate);
+    setShowDatePicker(false)
+  };
+
+  const getDatePicker = () => {
+    let datePicker = <DateTimePicker
+      value={date}
+      is24Hour={true}
+      onChange={onChange}
+      mode='date' />
+
+    const dateString = moment(date).format('dddd, D [de] MMMM [de] YYYY')
+
+    if (Platform.OS === 'android') {
+      datePicker = (
+        <View>
+          <TouchableOpacity onPress={() => setShowDatePicker(true)}>
+            <Text style={styles.date}>
+              {dateString}
+            </Text>
+          </TouchableOpacity>
+          {showDatePicker && datePicker}
+        </View>
+      )
+    }
+
+    return datePicker
+  }
   return (
     <Modal transparent={true}
       visible={props.isVisible}
@@ -28,14 +60,14 @@ const addTask = (props) => {
         <Text style={styles.header}>Nova Tarefa</Text>
         <TextInput style={styles.input}
           placeholder="Informe a descrição..."
-          onChangeText={desc => this.setState({ desc })}
-          value={state.desc} />
-        
+          onChangeText={desc => setDesc(desc)}
+          value={desc} />
+        {getDatePicker()}
         <View style={styles.buttons}>
           <TouchableOpacity onPress={props.onCancel}>
             <Text style={styles.button}>Cancelar</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={ props.Save }>
+          <TouchableOpacity onPress={props.Save}>
             <Text style={styles.button}>Salvar</Text>
           </TouchableOpacity>
         </View>
